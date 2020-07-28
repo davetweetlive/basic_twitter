@@ -46,6 +46,8 @@ func indexGetHandler(w http.ResponseWriter, r *http.Request) {
 	ctx := context.TODO()
 	comments, err := client.LRange(ctx, "comments", 0, 10).Result()
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error!"))
 		return
 	}
 	templates.ExecuteTemplate(w, "index.html", comments)
@@ -55,7 +57,13 @@ func indexPostHandler(w http.ResponseWriter, r *http.Request) {
 	r.ParseForm()
 	ctx := context.TODO()
 	comment := r.PostForm.Get("comment")
-	client.LPush(ctx, "comments", comment)
+	err := client.LPush(ctx, "comments", comment).Err()
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error!"))
+		return
+	}
+
 	http.Redirect(w, r, "/", 302)
 }
 
@@ -69,10 +77,16 @@ func loginPostHandler(w http.ResponseWriter, r *http.Request) {
 	username := r.PostForm.Get("username")
 	password := r.PostForm.Get("password")
 	hash, err := client.Get(ctx, "user:"+username).Bytes()
-	if err != nil {
+	if err == redis.Nil {
+		templates.ExecuteTemplate(w, "login.html", "Unknown User!")
+		return
+	} else if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error!"))
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword(hash, []byte(password)); err != nil {
+		templates.ExecuteTemplate(w, "login.html", "Invalid login!")
 		return
 	}
 	session, _ := store.Get(r, "session")
@@ -94,22 +108,15 @@ func registerPostHandler(w http.ResponseWriter, r *http.Request) {
 
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), cost)
 	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error!"))
 		return
 	}
-	client.Set(ctx, "user:"+username, hash, 0)
+
+	if err := client.Set(ctx, "user:"+username, hash, 0).Err(); err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("Internal server error!"))
+		return
+	}
 	http.Redirect(w, r, "/login", 302)
 }
-
-// func testGetHandler(w http.ResponseWriter, r *http.Request) {
-// 	session, _ := store.Get(r, "session")
-// 	untype, ok := session.Values["username"]
-
-// 	if !ok {
-// 		return
-// 	}
-// 	username, ok := untype.(string)
-// 	if !ok {
-// 		return
-// 	}
-// 	w.Write([]byte(username))
-// }
