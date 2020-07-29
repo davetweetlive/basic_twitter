@@ -4,20 +4,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comments</title>
+    <title>Updates</title>
     <link rel="stylesheet" href="/static/index.css">
 </head>
 
 <body>
-    <h1>Comments</h1>
+    <h1>Updates</h1>
 
     <form method="POST">
-        <textarea name="comment" id="" cols="30" rows="10"></textarea>
-        <button type="submit">Post Comment</button>
+        <textarea name="update" id="" cols="30" rows="5"></textarea>
+        <button type="submit">Post Update</button>
     </form>
 
     {{ range . }}
-    <div>{{ . }}</div>
+    <div>
+        <div>
+            <strong>
+                {{ .GetUser.GetUsername }} wrote:
+            </strong>
+        </div>
+        <div>{{ .GetBody }}</div>
+    </div>
     {{ end }}
 </body>
 
