@@ -9,23 +9,32 @@
 </head>
 
 <body>
-    <h1>{{ .Title }}</h1>
+    <nav>
+        <a href="/logout"> Logout</a>
+    </nav>
+    <main>
+        <h1>{{ .Title }}</h1>
 
-    <form method="POST">
-        <textarea name="update" id="" cols="30" rows="5"></textarea>
-        <button type="submit">Post Update</button>
-    </form>
-
-    {{ range .Updates }}
-    <div>
-        <div>
-            <strong>
-                {{ .GetUser.GetUsername }} wrote:
-            </strong>
+        {{ if .DisplayForm }}
+        <div id="update-form">
+            <form action="/" method="POST">
+                <textarea name="update" id="" cols="30" rows="5"></textarea>
+                <button type="submit">Post Update</button>
+            </form>
         </div>
-        <div>{{ .GetBody }}</div>
-    </div>
-    {{ end }}
+        {{ end }}
+
+        {{ range .Updates }}
+        <div class="updates">
+            <div>
+                <strong>
+                    <a href="/{{ .GetUser.GetUsername }}">{{ .GetUser.GetUsername }}</a> wrote:
+                </strong>
+            </div>
+            <div>{{ .GetBody }}</div>
+        </div>
+        {{ end }}
+    </main>
 </body>
 
 </html>

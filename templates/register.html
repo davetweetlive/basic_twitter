@@ -8,6 +8,11 @@
 </head>
 
 <body>
+    {{ if . }}
+    <div class="error">
+        <p>{{ . }}</p>
+    </div>
+    {{ end }}
     <form method="POST">
         <div> Username: <input type="text" name="username"></div><br>
         <div> Password: <input type="text" name="password"></div><br>

@@ -9,15 +9,20 @@ import (
 )
 
 var (
-	ErrUserNotFound = errors.New("User Not Found!")
-	ErrInvalidLogin = errors.New("Invalid Login!")
+	ErrUserNotFound  = errors.New("User Not Found!")
+	ErrInvalidLogin  = errors.New("Invalid Login!")
+	ErrUsernameTaken = errors.New("The username is already taken!")
 )
 
 type User struct {
-	key string
+	id int64
 }
 
 func NewUser(username string, hash []byte) (*User, error) {
+	exists, err := client.HExists(ctx, "user:by-username", username).Result()
+	if exists {
+		return nil, ErrUsernameTaken
+	}
 	id, err := client.Incr(ctx, "user:next-id").Result()
 	if err != nil {
 		return nil, err
@@ -33,19 +38,22 @@ func NewUser(username string, hash []byte) (*User, error) {
 	if err != nil {
 		return nil, err
 	}
-	return &User{key}, nil
+	return &User{id}, nil
 }
 
 func (user *User) GetId() (int64, error) {
-	return client.HGet(ctx, user.key, "id").Int64()
+
+	return user.id, nil
 }
 
 func (user *User) GetUsername() (string, error) {
-	return client.HGet(ctx, user.key, "username").Result()
+	key := fmt.Sprintf("user:%d", user.id)
+	return client.HGet(ctx, key, "username").Result()
 }
 
 func (user *User) GetHash() ([]byte, error) {
-	return client.HGet(ctx, user.key, "hash").Bytes()
+	key := fmt.Sprintf("user:%d", user.id)
+	return client.HGet(ctx, key, "hash").Bytes()
 }
 
 func (user *User) Authenticate(password string) error {
@@ -61,8 +69,7 @@ func (user *User) Authenticate(password string) error {
 }
 
 func GetUserById(id int64) (*User, error) {
-	key := fmt.Sprintf("user:%d", id)
-	return &User{key}, nil
+	return &User{id}, nil
 }
 
 func GetUserByUsername(username string) (*User, error) {
