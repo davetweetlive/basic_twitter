@@ -1,10 +1,10 @@
 package routes
 
 import (
-	"firstapp/middleware"
-	"firstapp/models"
-	"firstapp/sessions"
-	"firstapp/utils"
+	"basic_twitter/middleware"
+	"basic_twitter/models"
+	"basic_twitter/sessions"
+	"basic_twitter/utils"
 	"net/http"
 
 	"github.com/gorilla/mux"

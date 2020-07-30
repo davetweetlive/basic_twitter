@@ -1,9 +1,9 @@
 package main
 
 import (
-	"firstapp/models"
-	"firstapp/routes"
-	"firstapp/utils"
+	"basic_twitter/models"
+	"basic_twitter/routes"
+	"basic_twitter/utils"
 	"net/http"
 )
 

@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"firstapp/sessions"
+	"basic_twitter/sessions"
 	"net/http"
 )
 
