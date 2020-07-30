@@ -4,19 +4,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Updates</title>
+    <title>{{ .Title }}</title>
     <link rel="stylesheet" href="/static/index.css">
 </head>
 
 <body>
-    <h1>Updates</h1>
+    <h1>{{ .Title }}</h1>
 
     <form method="POST">
         <textarea name="update" id="" cols="30" rows="5"></textarea>
         <button type="submit">Post Update</button>
     </form>
 
-    {{ range . }}
+    {{ range .Updates }}
     <div>
         <div>
             <strong>
